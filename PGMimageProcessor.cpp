@@ -2,19 +2,17 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <istream>
+#include <sstream>
 
-/*
-yrlnic001::PGMimageProcessor::PGMimageProcessor(std::string f, int min, int max, int thresh) : filename(f), minCoponentSize(min), maxComponentSize(max), threshold(thresh)
+yrlnic001::PGMimageProcessor::PGMimageProcessor(int min, int max, int thresh) : minCoponentSize(min), maxComponentSize(max), threshold(thresh)
 { // constructor
 }
+
 yrlnic001::PGMimageProcessor::~PGMimageProcessor()
 { // destructor
 }
 
-*/
-
-yrlnic001::PGMimageProcessor::PGMimageProcessor(const yrlnic001::PGMimageProcessor &p) : filename(p.filename)
+yrlnic001::PGMimageProcessor::PGMimageProcessor(const yrlnic001::PGMimageProcessor &p)
 { // Copy Constructor
     /*
     id is a char pointer
@@ -25,7 +23,7 @@ yrlnic001::PGMimageProcessor::PGMimageProcessor(const yrlnic001::PGMimageProcess
     */
 }
 
-yrlnic001::PGMimageProcessor::PGMimageProcessor(yrlnic001::PGMimageProcessor &&p) : filename(p.filename)
+yrlnic001::PGMimageProcessor::PGMimageProcessor(yrlnic001::PGMimageProcessor &&p)
 { // move constructor
   // set pointer to null
 }
@@ -34,7 +32,7 @@ yrlnic001::PGMimageProcessor &yrlnic001::PGMimageProcessor::operator=(const yrln
 {
     if (this != &rhs) // Checks to make that we are not performing a self-assignment
     {
-        this->filename = rhs.filename;
+
         // this->col = rhs.col;
 
         // for pointer
@@ -59,7 +57,7 @@ yrlnic001::PGMimageProcessor &yrlnic001::PGMimageProcessor::operator=(yrlnic001:
     if (this != &rhs) // Checks to make that we are not performing a
     // self-assignment
     {
-        this->filename = rhs.filename;
+
         // this->col = rhs.col;
 
         // for pointer
@@ -83,7 +81,6 @@ yrlnic001::PGMimageProcessor &yrlnic001::PGMimageProcessor::operator=(yrlnic001:
 
 void yrlnic001::PGMimageProcessor::readInFile(std::string filename)
 {
-    /*
     std::ifstream myFile;
 
     myFile.open(filename, std::ios::binary); // reads the file in as binary
@@ -100,6 +97,9 @@ void yrlnic001::PGMimageProcessor::readInFile(std::string filename)
     iss >> columns;
     iss >> rows;
 
+    width = columns;
+    height = rows;
+
     std::string temp;
     myFile >> temp >> std::ws;
     // pointer to the array that holds the image
@@ -110,5 +110,17 @@ void yrlnic001::PGMimageProcessor::readInFile(std::string filename)
     if (myFile)
         std::cout << "all characters read successfully." << std::endl;
     myFile.close();
-    */
+}
+
+void yrlnic001::PGMimageProcessor::testOutput()
+{
+    // here because processFrames doesnt work
+    std::ofstream outfile("test.pgm", std::ofstream::binary);
+    outfile << "P5\n"
+            << width << " " << height << "\n"
+            << "255"
+            << "\n";
+    int size = width * height;
+    outfile.write((char *)image, size);
+    outfile.close();
 }

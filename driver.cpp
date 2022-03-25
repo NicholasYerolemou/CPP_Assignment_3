@@ -1,11 +1,13 @@
 #include <string>
 #include <iostream>
-
+#include "PGMimageProcessor.h"
 void processFlag()
 {
 }
 int main(int argc, char *argv[])
 {
+    int min, max, thresh;
+    std::string filename;
     // validate input
     if (argc == 1)
     {
@@ -21,6 +23,10 @@ int main(int argc, char *argv[])
         std::cout << "Error: Incorrect file format" << std::endl;
         std::exit(0);
     }
+    else
+    {
+        filename = argv[argc - 1];
+    }
 
     // to-do
     // handle input where incorrect number of parameters given for tag
@@ -33,15 +39,15 @@ int main(int argc, char *argv[])
 
         if (flag == "-s")
         {
-            int min = std::stoi(argv[counter + 1]); // min valid component size
-            int max = std::stoi(argv[counter + 2]); // max valid component size
+            min = std::stoi(argv[counter + 1]); // min valid component size
+            max = std::stoi(argv[counter + 2]); // max valid component size
             counter += 3;
             argc -= 3;
             std::cout << "flag s " << min << ":" << max << std::endl;
         }
         if (flag == "-t")
         {
-            int thresh = std::stoi(argv[counter + 1]); // threshold for counter detection
+            thresh = std::stoi(argv[counter + 1]); // threshold for counter detection
             counter += 2;
             argc -= 2;
             std::cout << "flag t " << thresh << std::endl;
@@ -62,8 +68,9 @@ int main(int argc, char *argv[])
             std::cout << "flag w " << outfile << std::endl;
         }
     }
-    // do more error checking
-    // yrlnic001::PGMimageProcessor obj(argv[-1], std::stoi(argv[2]), std::stoi(argv[3]), std::stoi(argv[5])); // calls constructor
-    std::cout << "done" << std::endl;
+
+    yrlnic001::PGMimageProcessor myObj(min, max, thresh); // creates object of PGMimageProcessor class
+    myObj.readInFile(filename);                           // reads in file
+    myObj.testOutput();
     return 0;
 }
