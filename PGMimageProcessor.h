@@ -9,16 +9,17 @@ namespace yrlnic001
     {
         std::string filename;
         int minCoponentSize, maxComponentSize;
+        int threshold;
 
     public:
-        PGMimageProcessor(std::string, int min, int max);           // constructor
-        ~PGMimageProcessor();                                       // destructor
-        PGMimageProcessor(const PGMimageProcessor &p);              // Copy Constructor
-        PGMimageProcessor(PGMimageProcessor &&p);                   // Move constructor
-        PGMimageProcessor &operator=(const PGMimageProcessor &rhs); // Copy Assignment Operator
-        PGMimageProcessor &operator=(PGMimageProcessor &&rhs);      // Move Assignment Operator
+        PGMimageProcessor(std::string, int min, int max, int thresh); // constructor
+        ~PGMimageProcessor();                                         // destructor
+        PGMimageProcessor(const PGMimageProcessor &p);                // Copy Constructor
+        PGMimageProcessor(PGMimageProcessor &&p);                     // Move constructor
+        PGMimageProcessor &operator=(const PGMimageProcessor &rhs);   // Copy Assignment Operator
+        PGMimageProcessor &operator=(PGMimageProcessor &&rhs);        // Move Assignment Operator
 
-        void readInFile();
+        void readInFile(std::string filename);
     };
 }
 

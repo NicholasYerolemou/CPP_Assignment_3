@@ -1,13 +1,18 @@
 #include "PGMimageProcessor.h"
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <istream>
 
-yrlnic001::PGMimageProcessor::PGMimageProcessor(std::string f, int min, int max) : filename(f), minCoponentSize(min), maxComponentSize(max)
+/*
+yrlnic001::PGMimageProcessor::PGMimageProcessor(std::string f, int min, int max, int thresh) : filename(f), minCoponentSize(min), maxComponentSize(max), threshold(thresh)
 { // constructor
 }
 yrlnic001::PGMimageProcessor::~PGMimageProcessor()
 { // destructor
 }
+
+*/
 
 yrlnic001::PGMimageProcessor::PGMimageProcessor(const yrlnic001::PGMimageProcessor &p) : filename(p.filename)
 { // Copy Constructor
@@ -76,17 +81,34 @@ yrlnic001::PGMimageProcessor &yrlnic001::PGMimageProcessor::operator=(yrlnic001:
     return *this;
 }
 
-int main(int argc, char *argv[])
+void yrlnic001::PGMimageProcessor::readInFile(std::string filename)
 {
-    // validate input
-    if (std::string(argv[1]).substr(-3) != ".pgm") // checks for correct type of file
-    {
-        std::cout << "Error: Incorrect file format";
-        std::exit(0);
-    }
-    // do more error checking
-    yrlnic001::PGMimageProcessor obj(argv[-1], std::stoi(argv[2]), std::stoi(argv[3])); // calls constructor
+    /*
+    std::ifstream myFile;
 
-    obj.readInFile();
-    return 0;
+    myFile.open(filename, std::ios::binary); // reads the file in as binary
+    std::string line;
+    getline(myFile, line); // p5 always first in the file
+    getline(myFile, line);
+    while (line[0] == '#') // gets rid of comment lines
+    {
+        getline(myFile, line);
+    }
+
+    std::istringstream iss(line); // reads number of pixel rows and columns
+    int rows, columns;
+    iss >> columns;
+    iss >> rows;
+
+    std::string temp;
+    myFile >> temp >> std::ws;
+    // pointer to the array that holds the image
+    int size = rows * columns;
+    image = new unsigned char[size]; // dynamically allocates memory to image array
+
+    myFile.read((char *)image, size); // read clock of unsgned chars in
+    if (myFile)
+        std::cout << "all characters read successfully." << std::endl;
+    myFile.close();
+    */
 }
