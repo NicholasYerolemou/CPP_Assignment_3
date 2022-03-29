@@ -1,6 +1,6 @@
 #ifndef PGMimageProcessor_H
 #define PGMimageProcessor_H
-
+#include "ConnectedComponent.h"
 #include <string>
 #include <vector>
 
@@ -8,13 +8,14 @@ namespace yrlnic001
 {
     class PGMimageProcessor
     {
+    private:
         int minCoponentSize, maxComponentSize;
-        int threshold;
-        unsigned char *image; // holds the unsigned chars that make up the .pgm image
-        int width, height;    // width and height of image
+        unsigned char *image;                         // holds the unsigned chars that make up the .pgm image
+        int width, height;                            // width and height of image
+        std::vector<ConnectedComponent *> components; // container of pointers to component objects
 
     public:
-        PGMimageProcessor(int min, int max, int thresh);            // constructor
+        PGMimageProcessor(int min, int max);                        // constructor
         ~PGMimageProcessor();                                       // destructor
         PGMimageProcessor(const PGMimageProcessor &p);              // Copy Constructor
         PGMimageProcessor(PGMimageProcessor &&p);                   // Move constructor
@@ -23,6 +24,12 @@ namespace yrlnic001
 
         void readInFile(std::string filename);
         void testOutput();
+        int extractComponents(int threshold, int minValidSize); // mkae thresh unsigned char
+        int filterComponentsBySize(int minSize, int maxSize);
+        bool writeComponents(const std::string &outFileName);
+        int getComponentCount(void) const;
+        int getLargestSize(void) const;
+        int getSmallestSize(void) const;
     };
 }
 

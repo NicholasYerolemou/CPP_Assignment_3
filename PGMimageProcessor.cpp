@@ -4,23 +4,18 @@
 #include <fstream>
 #include <sstream>
 
-yrlnic001::PGMimageProcessor::PGMimageProcessor(int min, int max, int thresh) : minCoponentSize(min), maxComponentSize(max), threshold(thresh)
+yrlnic001::PGMimageProcessor::PGMimageProcessor(int min, int max) : minCoponentSize(min), maxComponentSize(max)
 { // constructor
 }
 
 yrlnic001::PGMimageProcessor::~PGMimageProcessor()
 { // destructor
+
+    delete[] image;
 }
 
 yrlnic001::PGMimageProcessor::PGMimageProcessor(const yrlnic001::PGMimageProcessor &p)
 { // Copy Constructor
-    /*
-    id is a char pointer
-    if (p.id != nullptr)
-    {
-        id = new char(*p.id);
-    }
-    */
 }
 
 yrlnic001::PGMimageProcessor::PGMimageProcessor(yrlnic001::PGMimageProcessor &&p)
@@ -32,22 +27,6 @@ yrlnic001::PGMimageProcessor &yrlnic001::PGMimageProcessor::operator=(const yrln
 {
     if (this != &rhs) // Checks to make that we are not performing a self-assignment
     {
-
-        // this->col = rhs.col;
-
-        // for pointer
-        /*
-        if (this->id != nullptr)
-        {
-            delete this->id; // 'this' may already be managing a bit of
-            // memory so we must release it to prevent any memory leaks.
-            this->id = nullptr;
-        }
-        if (rhs.id != nullptr)
-        {
-            this->id = new char(*rhs.id);
-        }
-        */
     }
     return *this;
 }
@@ -57,24 +36,6 @@ yrlnic001::PGMimageProcessor &yrlnic001::PGMimageProcessor::operator=(yrlnic001:
     if (this != &rhs) // Checks to make that we are not performing a
     // self-assignment
     {
-
-        // this->col = rhs.col;
-
-        // for pointer
-        /*
-        if (this->id != nullptr)
-        {
-            delete this->id; // 'this' may already be managing a bit
-            // of memory so we must release it to prevent any memory leaks.
-            this->id = nullptr;
-        }
-        if (rhs.id != nullptr)
-        {
-            this->id = rhs.id;
-            rhs.id = nullptr; // rhs is no longer responsible for the bit
-            // of memory 'rhs.id' points to so we set it to nullptr
-        }
-        */
     }
     return *this;
 }
@@ -107,6 +68,11 @@ void yrlnic001::PGMimageProcessor::readInFile(std::string filename)
     image = new unsigned char[size]; // dynamically allocates memory to image array
 
     myFile.read((char *)image, size); // read clock of unsgned chars in
+    if (!myFile)
+    {
+        std::cout << "false" << std::endl;
+    }
+
     if (myFile)
         std::cout << "all characters read successfully." << std::endl;
     myFile.close();
@@ -124,3 +90,47 @@ void yrlnic001::PGMimageProcessor::testOutput()
     outfile.write((char *)image, size);
     outfile.close();
 }
+
+int yrlnic001::PGMimageProcessor::extractComponents(int threshold, int minValidSize)
+{
+    /* process the input image to extract all the connected components,
+ based on the supplied threshold (0...255) and excluding any components
+ of less than the minValidSize. The final number of components that
+ you store in your container (after discarding undersized one)
+ must be returned.
+ */
+}
+
+int filterComponentsBySize(int minSize, int maxSize)
+{
+    /* iterate - with an iterator - though your container of connected
+components and filter out (remove) all the components which do not
+obey the size criteria pass as arguments. The number remaining
+after this operation should be returned.
+*/
+}
+
+bool writeComponents(const std::string &outFileName)
+{
+    /* create a new PGM file which contains all current components
+(255=component pixel, 0 otherwise) and write this to outFileName as a
+valid PGM. the return value indicates success of operation
+*/
+}
+
+/*
+int getComponentCount(void) const
+{
+    // return number of components
+}
+
+int getLargestSize(void) const
+{
+    // return number of pixels in largest components
+}
+
+int getSmallestSize(void) const
+{
+    // return number of pixels in smallest component
+}
+*/
