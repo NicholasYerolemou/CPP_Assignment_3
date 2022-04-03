@@ -55,3 +55,8 @@ int yrlnic001::ConnectedComponent::getID()
 {
     return componentID;
 }
+
+std::vector<std::pair<int, int>> yrlnic001::ConnectedComponent::getCoords()
+{
+    return coords;
+}

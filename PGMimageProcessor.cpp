@@ -6,6 +6,7 @@
 #include <sstream>
 #include <queue>
 #include <memory>
+#include <algorithm>
 
 yrlnic001::PGMimageProcessor::PGMimageProcessor(int min, int max) : minCoponentSize(min), maxComponentSize(max)
 { // constructor
@@ -117,8 +118,6 @@ int yrlnic001::PGMimageProcessor::extractComponents(int threshold, int minValidS
 
             if (comp->getNumPixels() >= minValidSize)
                 components.push_back(comp);
-            std::cout << "component size: " << comp->getNumPixels() << std::endl;
-            // std::cout << "this should be 0 it is: " << image[i] << std::endl;
         }
     }
 
@@ -135,7 +134,7 @@ void yrlnic001::PGMimageProcessor::beginComponentSearch(std::queue<int> q, int t
 
         std::pair<int, int> p1;
         p1.first = num % width;
-        p1.second = num % height;
+        p1.second = num % height + 1;
         comp->addPixel(p1);
         // std::cout << "pixel num: " << num << std::endl;
         q.pop();
@@ -226,7 +225,6 @@ int yrlnic001::PGMimageProcessor::filterComponentsBySize(int minSize, int maxSiz
 bool yrlnic001::PGMimageProcessor::writeComponents(const std::string &outFileName)
 {
     std::string name = outFileName;
-    std::cout << name << std::endl;
 
     std::ofstream outfile(name, std::ofstream::binary);
     outfile << "P5\n"
@@ -234,8 +232,30 @@ bool yrlnic001::PGMimageProcessor::writeComponents(const std::string &outFileNam
             << "255"
             << "\n";
     int size = width * height;
-    outfile.write((char *)image, size);
+
+    unsigned char *outImage = new unsigned char[size];
+
+    std::vector<int> fore = getForeground(); // positions of all foreground pixels
+
+    int p = 0;
+    for (int i = 0; i < size; i++)
+    {
+        auto iter = std::find(fore.begin(), fore.end(), i);
+
+        if (iter != fore.end()) // if the position in the image is a part of the foreground i.e. in the fore array
+        {
+            outImage[i] = 255;
+            ++p;
+        }
+        else
+        {
+            outImage[i] = 0;
+        }
+    }
+    outfile.write((char *)outImage, size);
     outfile.close();
+
+    delete[] outImage;
     return false;
 }
 
@@ -264,7 +284,7 @@ int yrlnic001::PGMimageProcessor::getLargestSize(void) const
 int yrlnic001::PGMimageProcessor::getSmallestSize(void) const
 {
     std::shared_ptr<ConnectedComponent> s;
-    int min = 0;
+    int min = 100000;
     for (auto it = begin(components); it != end(components); ++it)
     {
         // if the componet within the bounds
@@ -281,6 +301,36 @@ void yrlnic001::PGMimageProcessor::printComponentData(const ConnectedComponent &
 {
     ConnectedComponent c(theComponent);
     std::cout << "ID: " << c.getID() << " Number of Pixels: " << c.getNumPixels() << std::endl;
+}
+
+std::vector<std::shared_ptr<yrlnic001::ConnectedComponent>> yrlnic001::PGMimageProcessor::getComponents()
+{
+
+    return components;
+}
+
+std::vector<int> yrlnic001::PGMimageProcessor::getForeground()
+{
+    std::vector<int> output;                                        // holds the positions of all the foreground elements in the image
+    for (auto it = components.begin(); it < components.end(); ++it) // loop through all components
+    {
+        std::shared_ptr<ConnectedComponent> s = *it;
+
+        std::vector<std::pair<int, int>> coords = s->getCoords(); // get a vector holding the coords of all pixels in this component
+
+        // convert coords to a single array position
+        std::vector<int> temp;
+        for (auto i = coords.begin(); i < coords.end(); ++i)
+        {
+            std::pair<int, int> t = *i;
+            int tempy = width * t.second;
+            int pos = t.first + tempy;
+            temp.push_back(pos);
+        }
+        output.insert(output.end(), temp.begin(), temp.end()); // add the array of positions to main array
+    }
+
+    return output;
 }
 
 // testing

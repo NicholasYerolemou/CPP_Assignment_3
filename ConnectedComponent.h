@@ -1,7 +1,5 @@
 #ifndef ConnectedComponent_H
 #define ConnectedComponent_H
-
-#include "PGMimageProcessor.h"
 #include <utility>
 #include <vector>
 
@@ -24,6 +22,7 @@ namespace yrlnic001
         void addPixel(std::pair<int, int> p);
         int getNumPixels();
         int getID();
+        std::vector<std::pair<int, int>> getCoords();
         // implement big 6
     };
 }

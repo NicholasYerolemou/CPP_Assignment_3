@@ -33,6 +33,9 @@ int main(int argc, char *argv[])
 
     argc -= 2; // remove counter for filename and executable. The rest are flags
     int counter = 1;
+    bool p = false;
+    bool w = false;
+    std::string outfile;
     while (argc != 0) // loop until all flags are processed
     {
         std::string flag = argv[counter]; // gets the flag
@@ -57,14 +60,16 @@ int main(int argc, char *argv[])
         { // print out component data ,total component number and sizes of smalles and largest componets
             counter += 1;
             argc -= 1;
+            p = true;
             // std::cout << "flag p " << std::endl;
         }
         if (flag == "-w")
         { // write out retained components to PGM file
 
-            std::string outfile = argv[counter + 1];
+            outfile = argv[counter + 1];
             counter += 2;
             argc -= 2;
+            w = true;
             // std::cout << "flag w " << outfile << std::endl;
         }
     }
@@ -74,10 +79,25 @@ int main(int argc, char *argv[])
     myObj.TestImage(thresh);
     myObj.testOutput("A");
     myObj.extractComponents(thresh, min);
-    std::cout << "components extracted" << std::endl;
-    std::cout << "number of components are: " << myObj.getComponentCount() << std::endl;
     // myObj.writeComponents("stuff.pgm");
     myObj.testOutput("B");
     // myObj.~PGMimageProcessor();
+
+    if (p)
+    {
+        std::vector<std::shared_ptr<yrlnic001::ConnectedComponent>> c = myObj.getComponents();
+
+        for (auto it = c.begin(); it < c.end(); it++)
+        {
+            myObj.printComponentData(**it);
+        }
+        std::cout << "The total number of components are: " << myObj.getComponentCount() << std::endl;
+        std::cout << "The largest component has size: " << myObj.getLargestSize() << std::endl;
+        std::cout << "The smallest component has size: " << myObj.getSmallestSize() << std::endl;
+    }
+    if (w)
+    {
+        myObj.writeComponents(outfile);
+    }
     return 0;
 }

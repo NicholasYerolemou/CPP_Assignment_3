@@ -38,6 +38,8 @@ namespace yrlnic001
         bool checkValue(int i, int size);
         void TestImage(int thresh);
         int getNumComponents();
+        std::vector<std::shared_ptr<ConnectedComponent>> getComponents();
+        std::vector<int> getForeground();
 
         // testing
         void addComponent(std::shared_ptr<ConnectedComponent> s);
