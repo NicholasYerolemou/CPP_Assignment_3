@@ -2,10 +2,11 @@ CC=g++
 CXXFLAGS=$(INCLUDES) -Wall # Headers + All Warnings
 
 TARGET=findcomp
-OBJECTS=PGMimageProcessor.o ConnectedComponent.o driver.o
+OBJECTS= ConnectedComponent.o PGMimageProcessor.o driver.o
 # Linking Rule
 
 $(TARGET): $(OBJECTS)
+	$(CC) PGMimageProcessor.h
 	$(CC) $(OBJECTS) -o $(TARGET)
 	@cp $(TARGET) ./binaries
 
@@ -13,9 +14,9 @@ $(TARGET): $(OBJECTS)
 .cpp.o:
 	$(CC) $(CXXFLAGS) -c $<
 
-test: UnitTests.o
+test: UnitTests.o ConnectedComponent.o PGMimageProcessor.o
 	$(CC) -c UnitTests.cpp
-	$(CC) -o UnitTest UnitTests.o 
+	$(CC) -o UnitTest UnitTests.o ConnectedComponent.o PGMimageProcessor.o
 	./UnitTest
 
 clean:

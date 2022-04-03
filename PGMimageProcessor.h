@@ -33,10 +33,14 @@ namespace yrlnic001
         int getComponentCount(void) const;
         int getLargestSize(void) const;
         int getSmallestSize(void) const;
+        void printComponentData(const ConnectedComponent &theComponent) const;
         void beginComponentSearch(std::queue<int> q, int thresh, std::shared_ptr<ConnectedComponent> comp);
         bool checkValue(int i, int size);
         void TestImage(int thresh);
         int getNumComponents();
+
+        // testing
+        void addComponent(std::shared_ptr<ConnectedComponent> s);
     };
 }
 

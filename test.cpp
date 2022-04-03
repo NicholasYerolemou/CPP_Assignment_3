@@ -1,11 +1,18 @@
 #include <vector>
 #include <iostream>
+#include <memory>
 
 int main()
 {
-    std::vector<int> v = {1, 2, 3, 4};
+    std::vector<std::shared_ptr<int>> v;
+    std::shared_ptr<int> s = std::make_shared<int>(1);
+    v.push_back(s);
+    std::shared_ptr<int> s2 = std::make_shared<int>(1);
+    v.push_back(s2);
 
-    std::cout << v.back() << std::endl;
+    auto it = v.begin();
+
+    std::cout << **it << std::endl;
 
     return 0;
 }

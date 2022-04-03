@@ -114,14 +114,15 @@ int yrlnic001::PGMimageProcessor::extractComponents(int threshold, int minValidS
             std::queue<int> q;
             q.push(i); // adds the address of the first pixel in this component
             beginComponentSearch(q, threshold, comp);
-            components.push_back(comp);
+
+            if (comp->getNumPixels() >= minValidSize)
+                components.push_back(comp);
             std::cout << "component size: " << comp->getNumPixels() << std::endl;
             // std::cout << "this should be 0 it is: " << image[i] << std::endl;
         }
     }
-    std::cout << counter << std::endl;
 
-    return 0;
+    return components.size();
 }
 
 void yrlnic001::PGMimageProcessor::beginComponentSearch(std::queue<int> q, int thresh, std::shared_ptr<ConnectedComponent> co)
@@ -209,26 +210,21 @@ int yrlnic001::PGMimageProcessor::filterComponentsBySize(int minSize, int maxSiz
 {
 
     int counter = 0;
-    /*
-    for (auto it = begin(components); it != end(components); ++it)
+    std::shared_ptr<ConnectedComponent> s;
+    for (auto it = components.begin(); it != components.end(); ++it)
     {
         // if the componet within the bounds
-        if (it->getNumPixels() > minSize && it->getNumPixels() < maxSize)
+        s = *it;
+        if (s->getNumPixels() > minSize && s->getNumPixels() < maxSize)
         {
             ++counter;
         }
     }
-    */
     return counter;
 }
 
 bool yrlnic001::PGMimageProcessor::writeComponents(const std::string &outFileName)
 {
-    /* create a new PGM file which contains all current components
-(255=component pixel, 0 otherwise) and write this to outFileName as a
-valid PGM. the return value indicates success of operation
-*/
-    // here because processFrames doesnt work
     std::string name = outFileName;
     std::cout << name << std::endl;
 
@@ -251,32 +247,45 @@ int yrlnic001::PGMimageProcessor::getComponentCount(void) const
 int yrlnic001::PGMimageProcessor::getLargestSize(void) const
 {
     int max = 0;
-    /*
+    std::shared_ptr<ConnectedComponent> s;
     for (auto it = begin(components); it != end(components); ++it)
     {
+        s = *it;
         // if the componet within the bounds
-        if (it->getNumPixels() > max)
+        if (s->getNumPixels() > max)
         {
-            max = it->getNumPixels();
+            max = s->getNumPixels();
         }
     }
-    */
+
     return max;
 }
 
 int yrlnic001::PGMimageProcessor::getSmallestSize(void) const
 {
-
+    std::shared_ptr<ConnectedComponent> s;
     int min = 0;
-    /*
     for (auto it = begin(components); it != end(components); ++it)
     {
         // if the componet within the bounds
-        if (it->getNumPixels() < min)
+        s = *it;
+        if (s->getNumPixels() < min)
         {
-            min = it->getNumPixels();
+            min = s->getNumPixels();
         }
     }
-    */
     return min;
+}
+
+void yrlnic001::PGMimageProcessor::printComponentData(const ConnectedComponent &theComponent) const
+{
+    ConnectedComponent c(theComponent);
+    std::cout << "ID: " << c.getID() << " Number of Pixels: " << c.getNumPixels() << std::endl;
+}
+
+// testing
+
+void yrlnic001::PGMimageProcessor::addComponent(std::shared_ptr<ConnectedComponent> s)
+{
+    components.push_back(s);
 }
