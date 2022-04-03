@@ -78,10 +78,10 @@ void yrlnic001::PGMimageProcessor::readInFile(std::string filename)
     myFile.close();
 }
 
-void yrlnic001::PGMimageProcessor::testOutput()
+void yrlnic001::PGMimageProcessor::testOutput(std::string n)
 {
     // here because processFrames doesnt work
-    std::ofstream outfile("test.pgm", std::ofstream::binary);
+    std::ofstream outfile(n + "test.pgm", std::ofstream::binary);
     outfile << "P5\n"
             << width << " " << height << "\n"
             << "255"
@@ -94,9 +94,10 @@ void yrlnic001::PGMimageProcessor::testOutput()
 int yrlnic001::PGMimageProcessor::extractComponents(int threshold, int minValidSize)
 {
     int size = width * height;
+
     int counter = 0;
-    std::cout << "threshold is: " << threshold << std::endl;
-    std::cout << "size is : " << size << std::endl;
+    // std::cout << "threshold is: " << threshold << std::endl;
+    // std::cout << "size is : " << size << std::endl;
     for (int i = 0; i < size; ++i) // loop from top left along each row
     {
         if (image[i] >= threshold)
@@ -107,13 +108,14 @@ int yrlnic001::PGMimageProcessor::extractComponents(int threshold, int minValidS
             int id = 0;
 
             if (components.size() != 0)
-                id = components.back().getID();
+                id = components.back()->getID();
 
-            ConnectedComponent comp(id);
+            std::shared_ptr<ConnectedComponent> comp = std::make_shared<ConnectedComponent>(id); // makes a unique ptr to them ConnectedComponent object.
             std::queue<int> q;
             q.push(i); // adds the address of the first pixel in this component
             beginComponentSearch(q, threshold, comp);
             components.push_back(comp);
+            std::cout << "component size: " << comp->getNumPixels() << std::endl;
             // std::cout << "this should be 0 it is: " << image[i] << std::endl;
         }
     }
@@ -122,24 +124,22 @@ int yrlnic001::PGMimageProcessor::extractComponents(int threshold, int minValidS
     return 0;
 }
 
-void yrlnic001::PGMimageProcessor::beginComponentSearch(std::queue<int> q, int thresh, ConnectedComponent comp)
+void yrlnic001::PGMimageProcessor::beginComponentSearch(std::queue<int> q, int thresh, std::shared_ptr<ConnectedComponent> co)
 {
+    std::shared_ptr<ConnectedComponent> comp = co;
     int size = width * height;
-    int counter = 0;
-    while (!q.empty() && counter < 30)
+    while (!q.empty())
     {
-        ++c;
-        ++counter;
         int num = q.front();
 
         std::pair<int, int> p1;
         p1.first = num % width;
         p1.second = num % height;
-        comp.addPixel(p1);
+        comp->addPixel(p1);
         // std::cout << "pixel num: " << num << std::endl;
         q.pop();
         testImage.push_back(num);
-        image[num] = '0'; // so we wont visit this pixel again.
+        image[num] = 0; // so we wont visit this pixel again.
 
         // find pixels boardering this one;
         int n, s, e, w;
@@ -151,101 +151,27 @@ void yrlnic001::PGMimageProcessor::beginComponentSearch(std::queue<int> q, int t
         // if the neighbouring pixel is greater than threshold and within the image we add it to the queue
         if (image[n] >= thresh && checkValue(n, size)) // is pixel to the north is in the foreground
         {
+            image[n] = 0;
             q.push(n);
         }
         if (image[e] >= thresh && checkValue(e, size)) // is pixel to the east is in the foreground
         {
+            image[e] = 0;
             q.push(e);
         }
         if (image[s] >= thresh && checkValue(s, size)) // is pixel to the south is in the foreground
         {
+            image[s] = 0;
             q.push(s);
         }
         if (image[w] >= thresh && checkValue(w, size)) // is pixel to the west is in the foreground
         {
+            image[w] = 0;
             q.push(w);
         }
     }
 }
 
-/*
-void yrlnic001::PGMimageProcessor::beginComponentSearch(std::queue<int> q, int thresh) //, ConnectedComponent comp)
-{                                                                                      // completes a breadth first seach of the pixels
-    int size = width * height;
-    int num = q.front(); // gets the address of the first pixel in the queue
-    std::cout << "the currect position is " << num << std::endl;
-    if (num >= size || num < 0)
-    {
-
-        std::cout << "error:" << num << std::endl;
-    }
-
-    image[num] = 0;
-    std::cout << image[num] << std::endl;
-    std::cout << "the value at " << num << "is now: " << image[num] << std::endl;
-    // testImage[num] = 255;
-    q.pop(); // removes that pixel from the queue
-    std::pair<int, int> p1;
-    p1.first = num % width;
-    p1.second = num % height;
-    // comp.addPixel(p1); // adds the coords of the pixel to the component
-    // image[num] = 0; // set the pixel value to o so we dont count it again
-    q.pop(); // remove pixel that has already been added to component
-
-    // check to see if its neighbours are also above threshold.
-    int n, s, e, w;
-    n = num - width;
-    e = num + 1;
-    s = num + width;
-    w = num - 1;
-
-    n = checkValues(n, size, num);
-    e = checkValues(e, size, num);
-    s = checkValues(s, size, num);
-    w = checkValues(w, size, num);
-
-    if (image[n] >= thresh) // is pixel to the north is in the foreground
-    {
-        // std::cout << "N" << n << std::endl;
-        q.push(n);
-        q.push(n);
-        image[n] = 0;
-        testImage[n] = 255;
-        // std::cout << q.size() << std::endl;
-        beginComponentSearch(q, thresh); // begin seach for north component
-    }
-    if (image[e] >= thresh) // is pixel to the east is in the foreground
-    {
-        // std::cout << "E: " << e << std::endl;
-        q.push(e);
-        q.push(e);
-        image[e] = 0;
-        testImage[n] = 255;
-        // std::cout << q.size() << std::endl;
-        beginComponentSearch(q, thresh); // begin seach for east component
-    }
-    if (image[s] >= thresh) // is pixel to the south is in the foreground
-    {
-        // std::cout << "S" << s << std::endl;
-        q.push(s);
-        q.push(s);
-        image[s] = 0;
-        testImage[n] = 255;
-        // std::cout << q.size() << std::endl;
-        beginComponentSearch(q, thresh); // begin search for south component
-    }
-    if (image[w] >= thresh) // is pixel to the west is in the foreground
-    {
-        // std::cout << "W" << w << std::endl;
-        q.push(w);
-        q.push(w);
-        image[w] = 0;
-        testImage[n] = 255;
-        // std::cout << q.size() << std::endl;
-        beginComponentSearch(q, thresh); // begin seach for west component
-    }
-}
-*/
 bool yrlnic001::PGMimageProcessor::checkValue(int i, int size)
 {
     // if wihtin the image returns true;
@@ -260,20 +186,23 @@ void yrlnic001::PGMimageProcessor::TestImage(int thresh)
 {
     int size = width * height;
     int counter = 0;
+    int otherCounter = 0;
     for (int i = 0; i < size; i++)
     {
         if (image[i] > thresh)
         {
             image[i] = 255;
-            std::cout << image[i] << std::endl;
+            // std::cout << image[i] << std::endl;
             ++counter;
         }
         else
         {
             image[i] = 0;
+            ++otherCounter;
         }
     }
-    std::cout << "counter:" << counter << std::endl;
+    // std::cout << "counter:" << counter << std::endl;
+    // std::cout << "other counter:" << otherCounter << std::endl;
 }
 
 int yrlnic001::PGMimageProcessor::filterComponentsBySize(int minSize, int maxSize)
