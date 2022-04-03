@@ -3,6 +3,8 @@
 #include "ConnectedComponent.h"
 #include <string>
 #include <vector>
+#include <queue>
+#include <memory>
 
 namespace yrlnic001
 {
@@ -10,9 +12,11 @@ namespace yrlnic001
     {
     private:
         int minCoponentSize, maxComponentSize;
-        unsigned char *image;                         // holds the unsigned chars that make up the .pgm image
-        int width, height;                            // width and height of image
-        std::vector<ConnectedComponent *> components; // container of pointers to component objects
+        unsigned char *image; // holds the unsigned chars that make up the .pgm image
+        std::vector<int> testImage;
+        int width, height; // width and height of image
+
+        // std::vector<std::unique_ptr<ConnectedComponent>> components; // container of smart pointers to component objects
 
     public:
         PGMimageProcessor(int min, int max);                        // constructor
@@ -30,6 +34,11 @@ namespace yrlnic001
         int getComponentCount(void) const;
         int getLargestSize(void) const;
         int getSmallestSize(void) const;
+        void beginComponentSearch(std::queue<int> q, int thresh, ConnectedComponent comp); //, ConnectedComponent comp);
+        bool checkValue(int i, int size);
+        void TestImage(int thresh);
+        int c = 0;
+        std::vector<ConnectedComponent> components;
     };
 }
 

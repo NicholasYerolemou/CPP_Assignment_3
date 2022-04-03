@@ -7,6 +7,7 @@ void processFlag()
 int main(int argc, char *argv[])
 {
     int min, max, thresh;
+    // unsigned char thresh;
     std::string filename;
     // validate input
     if (argc == 1)
@@ -16,7 +17,6 @@ int main(int argc, char *argv[])
     }
 
     int len = std::string(argv[argc - 1]).length(); // length of the final parameter given (filename)
-    std::cout << len << std::endl;
 
     if (std::string(argv[argc - 1]).substr(len - 4) != ".pgm") // checks for correct file extension
     {
@@ -69,8 +69,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    yrlnic001::PGMimageProcessor myObj(min, max, thresh); // creates object of PGMimageProcessor class
-    myObj.readInFile(filename);                           // reads in file
-    myObj.testOutput();
+    yrlnic001::PGMimageProcessor myObj(min, max); // creates object of PGMimageProcessor class
+    myObj.readInFile(filename);                   // reads in file
+    myObj.TestImage(thresh);
+    myObj.extractComponents(thresh, min);
+    std::cout << "components extracted" << std::endl;
+    std::cout << "number of components are: " << myObj.components.size() << std::endl;
+    // myObj.writeComponents("stuff.pgm");
+    //  myObj.testOutput();
+    // myObj.~PGMimageProcessor();
     return 0;
 }

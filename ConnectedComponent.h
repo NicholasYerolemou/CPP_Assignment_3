@@ -14,7 +14,10 @@ namespace yrlnic001
         std::vector<std::pair<int, int>> coords; // holds the coordinates of each pixel in the component
 
     public:
-        ConnectedComponent(int numPixels); // finish this
+        ConnectedComponent(int oldID); // finish this
+        void addPixel(std::pair<int, int> p);
+        int getNumPixels();
+        int getID();
         // implement big 6
     };
 }
